@@ -93,6 +93,10 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
+-- [Swagnik] This gives a tree like structure in the netrw view
+-- To switch between different views press `i`
+vim.g.netrw_liststyle = 3
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -102,7 +106,7 @@ vim.g.have_nerd_font = false
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -122,7 +126,8 @@ end)
 vim.o.breakindent = true
 
 -- Save undo history
-vim.o.undofile = true
+-- I don't want to save undo history, hence setting it false.
+vim.o.undofile = false
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.o.ignorecase = true
@@ -184,16 +189,21 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+-- [Swagnik] Added this to split pane using pipe
+vim.keymap.set('n', '|', ':vsp | terminal<CR>', { desc = 'Open terminal in vertical split' })
+
 -- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+-- [Swagnik] Uncommenting these lines, to build stronger hjkl muscle memory
+vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
+-- [Swagnik] I would have to have split panes for this.
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
@@ -247,7 +257,37 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+
+  --'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  {
+    'NMAC427/guess-indent.nvim',
+    config = function()
+      -- This is the default configuration
+      require('guess-indent').setup {
+        auto_cmd = true, -- Set to false to disable automatic execution
+        override_editorconfig = false, -- Set to true to override settings set by .editorconfig
+        filetype_exclude = { -- A list of filetypes for which the auto command gets disabled
+          'netrw',
+          'tutor',
+        },
+        buftype_exclude = { -- A list of buffer types for which the auto command gets disabled
+          'help',
+          'nofile',
+          'terminal',
+          'prompt',
+        },
+        on_tab_options = { -- A table of vim options when tabs are detected
+          ['expandtab'] = false,
+        },
+        on_space_options = { -- A table of vim options when spaces are detected
+          ['expandtab'] = true,
+          ['tabstop'] = 'detected', -- If the option value is 'detected', The value is set to the automatically detected indent size.
+          ['softtabstop'] = 'detected',
+          ['shiftwidth'] = 'detected',
+        },
+      }
+    end,
+  },
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -672,8 +712,8 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
+        gopls = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -835,7 +875,9 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        -- [Swagnik] setting preset to enter
+        -- preset = 'default',
+        preset = 'enter',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -894,7 +936,27 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      --
+      -- [Swagnik] Disabling tokyonight, using different theme (see below)
+      -- vim.cmd.colorscheme 'tokyonight-moon'
+    end,
+  },
+
+  {
+    'EdenEast/nightfox.nvim',
+    priority = 1000,
+    config = function()
+      -- To see all themes: https://github.com/EdenEast/nightfox.nvim
+      -- vim.cmd.colorscheme 'dayfox' -- nightfox, dayfox, dawnfox, duskfox, nordfox, terafox, carbonfox
+      local hour = tonumber(os.date '%H')
+
+      if hour >= 6 and hour < 18 then
+        -- morning time light theme
+        vim.cmd.colorscheme 'dayfox'
+      else
+        -- evening time dark theme
+        vim.cmd.colorscheme 'nordfox'
+      end
     end,
   },
 
