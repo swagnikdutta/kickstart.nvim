@@ -257,6 +257,32 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('nvim-tree').setup {
+        sort = {
+          sorter = 'case_sensitive',
+        },
+        view = {
+          width = 30,
+        },
+        renderer = {
+          group_empty = true,
+        },
+        filters = {
+          dotfiles = false,
+        },
+        update_focused_file = {
+          enable = true, -- automatically highlight the file in the tree
+          update_root = false, -- set to true if you want the tree root to follow the open file
+          ignore_list = {}, -- you can list dirs/files to ignore here
+        },
+      }
+    end,
+  },
 
   --'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
   {
@@ -740,6 +766,8 @@ require('lazy').setup({
             },
           },
         },
+
+        ts_ls = {},
       }
 
       -- Ensure the servers and tools above are installed
