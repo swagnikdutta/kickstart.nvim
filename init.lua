@@ -291,6 +291,15 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'tpope/vim-fugitive',
+    cmd = { 'Git', 'G', 'Gdiffsplit', 'Gvdiffsplit', 'Gstatus', 'Gblame' },
+    keys = {
+      { '<leader>gs', '<cmd>Git<CR>', desc = 'Git status (fugitive)' },
+      { '<leader>gb', '<cmd>Git blame<CR>', desc = 'Git blame (fugitive)' },
+    },
+  },
+
   --'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
   {
     'NMAC427/guess-indent.nvim',
