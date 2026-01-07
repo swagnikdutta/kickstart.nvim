@@ -270,11 +270,13 @@ require('lazy').setup({
           width = 30,
           relativenumber = true,
         },
-        renderer = {
-          group_empty = true,
-        },
+        -- renderer = {
+        --   group_empty = true,
+        -- },
         filters = {
           dotfiles = false,
+          git_ignored = false,
+          custom = {},
         },
         update_focused_file = {
           enable = true, -- automatically highlight the file in the tree
