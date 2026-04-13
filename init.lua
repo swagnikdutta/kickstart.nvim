@@ -331,6 +331,21 @@ require('lazy').setup({
           ['shiftwidth'] = 'detected',
         },
       }
+
+      -- Override for TypeScript/JavaScript to force 2-space indentation
+      -- This runs after guess-indent has done its detection
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'typescript', 'javascript', 'typescriptreact', 'javascriptreact' },
+        callback = function()
+          -- Use defer_fn to ensure this runs after guess-indent's auto_cmd
+          vim.defer_fn(function()
+            vim.bo.tabstop = 2
+            vim.bo.shiftwidth = 2
+            vim.bo.softtabstop = 2
+            vim.bo.expandtab = true
+          end, 10)
+        end,
+      })
     end,
   },
 
@@ -1005,7 +1020,7 @@ require('lazy').setup({
 
       if hour >= 6 and hour < 18 then
         -- morning time light theme
-        vim.cmd.colorscheme 'dayfox'
+        vim.cmd.colorscheme 'nordfox'
       else
         -- evening time dark theme
         vim.cmd.colorscheme 'nordfox'
